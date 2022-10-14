@@ -28,9 +28,12 @@ class TunnelNetwork:
         self.tunnel_info = tunnel_info
         self.target_ip = target_ip
         self.target_port = target_port
-        self.local_bind = (local_host or 'localhost',)
+
+        local_host = local_host or 'localhost'
         if local_port:
-            self.local_bind.append(local_port)
+            self.local_bind = (local_host, local_port)
+        else:
+            self.local_bind = (local_host,)
 
     def __enter__(self):
         if not self.start_tunnels():
