@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class TunnelNetwork:
-    def __init__(self, tunnel_info: list, target_ip: str, target_port: int):
+    def __init__(self, tunnel_info: list, target_ip: str, target_port: int, local_host: str=None, local_port: int=None):
         """Initialise Tunnel Network
         Arguments:
             tunnel_info {list} -- List of dictionary objects containing tunnel information
@@ -28,6 +28,9 @@ class TunnelNetwork:
         self.tunnel_info = tunnel_info
         self.target_ip = target_ip
         self.target_port = target_port
+        self.local_bind = (local_host or 'localhost',)
+        if local_port:
+            self.local_bind.append(local_port)
 
     def __enter__(self):
         if not self.start_tunnels():
@@ -58,6 +61,7 @@ class TunnelNetwork:
             # If we are the last element, the target is the real target
             if idx == len(self.tunnel_info) - 1:
                 target = (self.target_ip, self.target_port)
+                tunnel_info['local_bind_address'] = self.local_bind
             # Otherwise the target is the next bastion
             else:
                 target = (self.tunnel_info[idx + 1]['ssh_address_or_host'],
